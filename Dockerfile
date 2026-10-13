@@ -1,20 +1,20 @@
-# 1. Build and test the project using Java 25 and Maven.
+# 1. This builds and tests the project using Java 25 and Maven.
 FROM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 RUN mvn -B verify
 
-# 2. Run only the finished application, using a non-admin operating system user.
+# 2. This runs the finished application using a system account without admin access.
 FROM eclipse-temurin:25-jre
 WORKDIR /app
 RUN groupadd --system fittrack && useradd --system --gid fittrack fittrack
 COPY --from=build --chown=fittrack:fittrack /build/target/fittrack-0.0.1-SNAPSHOT.jar /app/fittrack.jar
 USER fittrack
-# Online containers must accept traffic from the hosting company's network.
-# The application refuses this address until sign-in details have been set.
+# This lets the hosted application receive requests from outside its container.
+# The application checks that sign-in details are set before accepting these requests.
 ENV FITTRACK_BIND_HOST=0.0.0.0
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/fittrack.jar"]
-# Online records must be stored in MySQL, not temporary memory.
+# This starts MySQL mode so records stay saved when the application stops.
 CMD ["--mysql"]

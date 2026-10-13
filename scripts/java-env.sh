@@ -1,4 +1,4 @@
-# Sourced by workspace scripts. Prefer an explicitly configured JDK.
+# Other scripts load this file to find Java. JAVA_HOME is checked first.
 if [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/java" ]; then
   FITTRACK_JAVA="$JAVA_HOME/bin/java"
 else

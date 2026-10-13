@@ -7,6 +7,7 @@ package com.fittrack.model;
  */
 public final class Workout implements Identifiable {
 
+  // These fields link the workout to a member and store its activity, date and duration.
   private final int memberId;
   private final String date;
   private final int workoutId;
@@ -14,9 +15,9 @@ public final class Workout implements Identifiable {
   private final int durationMinutes;
 
   /**
-   * Creates a workout with validated information.
+   * Creates a workout after checking its details.
    *
-   * @param workoutId unique workout identifier
+   * @param workoutId unique workout ID
    * @param activityType type of fitness activity
    * @param durationMinutes duration in minutes
    * @throws IllegalArgumentException if any value is invalid
@@ -27,16 +28,17 @@ public final class Workout implements Identifiable {
   }
 
   /**
-   * Creates a dated workout associated with one member.
+   * Creates a workout with a date and a link to one member.
    *
    * @param workoutId positive workout ID
    * @param memberId positive owner ID
    * @param activityType activity name
    * @param durationMinutes positive duration
-   * @param date ISO date, not in the future
+   * @param date date in YYYY-MM-DD format, no later than today
    */
   public Workout(
       int workoutId, int memberId, String activityType, int durationMinutes, String date) {
+    // This checks the owner and makes sure the workout date is valid and not in the future.
     if (memberId <= 0) throw new IllegalArgumentException("Member ID must be positive");
     try {
       if (java.time.LocalDate.parse(date).isAfter(java.time.LocalDate.now()))
@@ -46,6 +48,7 @@ public final class Workout implements Identifiable {
     }
     this.memberId = memberId;
     this.date = date;
+    // This checks that the workout has a positive ID, an activity name and a positive duration.
     if (workoutId <= 0) {
       throw new IllegalArgumentException("Workout ID must be positive");
     }
@@ -81,14 +84,14 @@ public final class Workout implements Identifiable {
   /**
    * Returns the completion date.
    *
-   * @return ISO date
+   * @return date in YYYY-MM-DD format
    */
   public String getDate() {
     return date;
   }
 
   /**
-   * Returns the unique workout identifier.
+   * Returns the unique workout ID.
    *
    * @return unique workout ID
    */

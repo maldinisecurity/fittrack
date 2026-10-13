@@ -1,6 +1,6 @@
 'use strict';
-// Optional webpage checks. Run against a separate, empty memory-mode server.
-// This tests DOM behaviour. It does not check browser appearance or layout.
+// These optional webpage checks use a separate, empty memory-mode server.
+// This checks webpage actions and content. It does not check the visual layout.
 const { JSDOM } = require('jsdom');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -9,7 +9,7 @@ const base = process.env.FITTRACK_API_URL || 'http://127.0.0.1:8092';
 const root = path.join(__dirname, '..');
 
 (async () => {
-  // Refuse to change a server that already contains records.
+  // This stops the checks if the server already contains records.
   for (const resource of ['members', 'workouts', 'challenges']) {
     const response = await fetch(`${base}/${resource}`);
     assert.equal(response.status, 200);
@@ -24,7 +24,7 @@ const root = path.join(__dirname, '..');
   });
   const { window } = page;
   const document = window.document;
-  // jsdom has no native dialog display. Provide only open/close for these unit checks.
+  // These functions let the test tool open and close dialogs.
   window.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
   window.HTMLDialogElement.prototype.close = function () { this.open = false; };
   window.fetch = (url, options) => fetch(new URL(url, base), options);
@@ -78,7 +78,7 @@ const root = path.join(__dirname, '..');
     fill('endDate', '2026-01-31'); await save();
     assert.equal(get('challenges-list').querySelector('progress').value, 50);
 
-    // Member deletion must show the API's protection message.
+    // This checks that a member with linked records cannot be deleted.
     firstAction('members', 'Delete').click(); get('confirm-delete').click();
     await waitFor(() => get('delete-error').textContent.includes('Delete member workouts'));
     assert.equal(get('delete-dialog').open, true); get('cancel-delete').click();
@@ -93,7 +93,7 @@ const root = path.join(__dirname, '..');
     assert.equal(get('challenges-list').querySelector('progress').value, 50);
     assert.match(get('challenges-list').textContent, /WORKOUT SESSIONS/);
 
-    // Text supplied by a user must not become an HTML element.
+    // This checks that a member name is shown as text, even when it contains HTML.
     firstAction('members', 'Edit').click(); fill('name', '<img src=x onerror=alert(1)>'); await save();
     assert.equal(get('members-list').querySelector('img'), null);
     assert.match(get('members-list').textContent, /<img src=x/);

@@ -1,6 +1,6 @@
 package com.fittrack.repository;
 
-/** Signals a duplicate identifier or a relational integrity conflict. */
+/** Reports a duplicate ID or a conflict with a linked record. */
 public final class ConflictException extends RuntimeException {
   /**
    * Creates a conflict.

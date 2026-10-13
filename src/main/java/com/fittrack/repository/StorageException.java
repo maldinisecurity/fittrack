@@ -1,11 +1,11 @@
 package com.fittrack.repository;
 
-/** Wraps database failures without exposing credentials to API clients. */
+/** Reports a database error without sending sign-in details in the API response. */
 public final class StorageException extends RuntimeException {
   /**
-   * Preserves the underlying failure for server-side logging.
+   * Keeps the original error so it can be recorded in the server log.
    *
-   * @param cause underlying failure
+   * @param cause original database error
    */
   public StorageException(Throwable cause) {
     super("Database operation failed", cause);

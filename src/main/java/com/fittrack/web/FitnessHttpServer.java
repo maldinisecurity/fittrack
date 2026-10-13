@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
 
-/** Local JSON REST API exposing members, workouts and challenges through Java HttpServer. */
+/** Handles web requests for members, workouts and challenges using Java HttpServer and JSON. */
 public final class FitnessHttpServer implements AutoCloseable {
   private static final Logger LOG = Logger.getLogger(FitnessHttpServer.class.getName());
   private final HttpServer server;
@@ -21,11 +21,11 @@ public final class FitnessHttpServer implements AutoCloseable {
   private final Gson gson = new GsonBuilder().setStrictness(Strictness.STRICT).create();
 
   /**
-   * Binds the API to loopback only.
+   * Creates an API server that accepts connections only from this computer.
    *
    * @param service application service
-   * @param port TCP port, or zero for an allocated test port
-   * @throws IOException if binding fails
+   * @param port server port, or zero to let Java choose a free port for a test
+   * @throws IOException if the server cannot open the address or port
    */
   public FitnessHttpServer(FitnessService service, int port) throws IOException {
     this(service, new ServerSettings("127.0.0.1", port, "", ""));
@@ -87,15 +87,15 @@ public final class FitnessHttpServer implements AutoCloseable {
   }
 
   /**
-   * Returns the bound port.
+   * Returns the port the server is using.
    *
-   * @return TCP port
+   * @return server port number
    */
   public int getPort() {
     return server.getAddress().getPort();
   }
 
-  /** Stops HTTP and worker threads. */
+  /** Stops the web server and the threads that handle its requests. */
   @Override
   public void close() {
     server.stop(0);
@@ -121,6 +121,7 @@ public final class FitnessHttpServer implements AutoCloseable {
                 List.of("/members", "/workouts", "/challenges")));
         return;
       }
+      // This reads the URL to find the record type, record ID and requested calculation.
       String[] parts = path.substring(1).split("/", -1);
       String resource = parts[0];
       if (!Set.of("members", "workouts", "challenges").contains(resource) || parts.length > 3) {
@@ -151,9 +152,11 @@ public final class FitnessHttpServer implements AutoCloseable {
         reply(x, 200, service.progress(id));
         return;
       }
+      // This sends requests to the service methods that read, add, change or delete records.
       switch (method) {
         case "GET" -> reply(x, 200, read(resource, id));
         case "POST", "PUT" -> {
+          // This checks the JSON request type, size and record ID before changing data.
           String contentType = x.getRequestHeaders().getFirst("Content-Type");
           if (contentType == null
               || !contentType.split(";", 2)[0].strip().equalsIgnoreCase("application/json")) {
@@ -189,6 +192,7 @@ public final class FitnessHttpServer implements AutoCloseable {
         }
         default -> throw new IllegalStateException();
       }
+    // This sends a clear response for each error and records unexpected errors in the server log.
     } catch (ConflictException e) {
       reply(x, 409, Map.of("error", e.getMessage()));
     } catch (NoSuchElementException e) {
@@ -314,7 +318,7 @@ public final class FitnessHttpServer implements AutoCloseable {
   }
 
   private void reply(HttpExchange x, int status, Object value) throws IOException {
-    // Gson's field names are the explicit API contract; normalise legacy model IDs.
+    // This converts record IDs to the common id field used in API responses.
     JsonElement json = gson.toJsonTree(value);
     normaliseIds(json);
     byte[] bytes = gson.toJson(json).getBytes(StandardCharsets.UTF_8);

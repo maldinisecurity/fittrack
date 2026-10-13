@@ -1,9 +1,9 @@
 package com.fittrack.model;
 
-/** A persistent entity with a stable positive identifier. */
+/** A shared interface for records that have a positive ID. */
 public interface Identifiable {
   /**
-   * Returns the persistent identifier.
+   * Returns the record ID used to find it in storage.
    *
    * @return positive entity ID
    */

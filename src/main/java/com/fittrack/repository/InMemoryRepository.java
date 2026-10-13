@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Thread-safe volatile storage for demonstrations and isolated unit tests.
  *
- * @param <T> stored entity type
+ * @param <T> type of record being stored
  */
 public final class InMemoryRepository<T extends Identifiable> implements Repository<T> {
   private final Map<Integer, T> entities = new TreeMap<>();

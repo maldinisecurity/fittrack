@@ -26,6 +26,7 @@ public final class ServerSettings {
     this.port = port;
     this.username = username == null ? "" : username;
     this.password = password == null ? "" : password;
+    // This checks the sign-in details before allowing access from other computers.
     if (this.username.isBlank() != this.password.isBlank())
       throw new IllegalArgumentException(
           "Set both FITTRACK_ADMIN_USER and FITTRACK_ADMIN_PASSWORD");
@@ -86,7 +87,7 @@ public final class ServerSettings {
     return !username.isBlank() && !password.isBlank();
   }
 
-  // These package-only methods are used by the password check, not by API responses.
+  // These methods let other classes in this package check the sign-in details.
   String username() {
     return username;
   }

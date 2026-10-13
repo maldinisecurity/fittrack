@@ -16,6 +16,7 @@ public final class FitTrackApp {
    * @throws java.io.IOException if the HTTP port cannot be bound
    */
   public static void main(String[] args) throws java.io.IOException {
+    // This selects the console demo or the HTTP server mode from the startup argument.
     if (args.length > 0 && args[0].equals("--demo")) {
       demo();
       return;
@@ -25,6 +26,7 @@ public final class FitTrackApp {
       throw new IllegalArgumentException("Use --demo, --memory or --mysql");
     var settings = com.fittrack.web.ServerSettings.fromEnvironment(System.getenv());
     com.fittrack.service.FitnessService service;
+    // MySQL mode stores records in the database; memory mode keeps them until the app stops.
     if (mysql) {
       String url = required("FITTRACK_DB_URL"),
           user = required("FITTRACK_DB_USER"),
@@ -43,6 +45,7 @@ public final class FitTrackApp {
               new com.fittrack.repository.InMemoryRepository<>(),
               new com.fittrack.repository.InMemoryRepository<>(),
               new com.fittrack.repository.InMemoryRepository<>());
+    // This starts the web server and closes its resources when the application stops.
     var server = new com.fittrack.web.FitnessHttpServer(service, settings);
     Runtime.getRuntime().addShutdownHook(new Thread(server::close));
     server.start();

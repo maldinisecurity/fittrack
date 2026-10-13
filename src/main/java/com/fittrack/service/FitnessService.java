@@ -4,14 +4,14 @@ import com.fittrack.model.*;
 import com.fittrack.repository.*;
 import java.util.*;
 
-/** Coordinates entity relationships independently of HTTP and storage technology. */
+/** Checks the rules for members, workouts and challenges, separately from web requests and storage. */
 public final class FitnessService {
   private final Repository<Member> members;
   private final Repository<Workout> workouts;
   private final Repository<Challenge> challenges;
 
   /**
-   * Injects storage strategies.
+   * Creates the service with the supplied storage objects.
    *
    * @param members member storage
    * @param workouts workout storage
@@ -27,7 +27,7 @@ public final class FitnessService {
   /**
    * Lists members.
    *
-   * @return snapshot
+   * @return a separate list of the saved records
    */
   public synchronized List<Member> members() {
     return members.findAll();
@@ -36,7 +36,7 @@ public final class FitnessService {
   /**
    * Lists workouts.
    *
-   * @return snapshot
+   * @return a separate list of the saved records
    */
   public synchronized List<Workout> workouts() {
     return workouts.findAll();
@@ -45,7 +45,7 @@ public final class FitnessService {
   /**
    * Lists challenges.
    *
-   * @return snapshot
+   * @return a separate list of the saved records
    */
   public synchronized List<Challenge> challenges() {
     return challenges.findAll();
@@ -56,7 +56,7 @@ public final class FitnessService {
    *
    * @param id ID
    * @return member
-   * @throws NoSuchElementException if absent
+   * @throws NoSuchElementException if the record does not exist
    */
   public synchronized Member member(int id) {
     return members.findById(id).orElseThrow(() -> new NoSuchElementException("Member not found"));
@@ -67,7 +67,7 @@ public final class FitnessService {
    *
    * @param id ID
    * @return workout
-   * @throws NoSuchElementException if absent
+   * @throws NoSuchElementException if the record does not exist
    */
   public synchronized Workout workout(int id) {
     return workouts.findById(id).orElseThrow(() -> new NoSuchElementException("Workout not found"));
@@ -78,7 +78,7 @@ public final class FitnessService {
    *
    * @param id ID
    * @return challenge
-   * @throws NoSuchElementException if absent
+   * @throws NoSuchElementException if the record does not exist
    */
   public synchronized Challenge challenge(int id) {
     return challenges
@@ -96,7 +96,7 @@ public final class FitnessService {
   /**
    * Registers a member.
    *
-   * @param m validated member
+   * @param m member whose details have already been checked
    */
   public synchronized void createMember(Member m) {
     uniqueEmail(m);
@@ -115,7 +115,7 @@ public final class FitnessService {
   }
 
   /**
-   * Deletes an unreferenced member.
+   * Deletes a member only when they have no workouts or challenges.
    *
    * @param id member ID
    * @throws ConflictException if related records remain
@@ -131,7 +131,7 @@ public final class FitnessService {
   /**
    * Records a workout for an existing member.
    *
-   * @param w validated workout
+   * @param w workout whose details have already been checked
    */
   public synchronized void createWorkout(Workout w) {
     member(w.getMemberId());
@@ -189,7 +189,7 @@ public final class FitnessService {
   }
 
   /**
-   * Evaluates a goal using runtime polymorphism.
+   * Calculates progress using the rule for this goal type. This is polymorphism.
    *
    * @param id goal ID
    * @return calculated progress
@@ -202,7 +202,7 @@ public final class FitnessService {
    * Calculates count, total and maximum duration for one member.
    *
    * @param id member ID
-   * @return immutable summary
+   * @return a summary whose values cannot be changed
    */
   public synchronized Summary summary(int id) {
     member(id);
@@ -216,7 +216,7 @@ public final class FitnessService {
   }
 
   /**
-   * Calculated member exercise totals.
+   * Stores a member's workout count, total minutes and longest workout.
    *
    * @param count number of workouts
    * @param totalMinutes total duration

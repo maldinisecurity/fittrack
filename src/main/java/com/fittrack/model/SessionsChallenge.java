@@ -10,9 +10,9 @@ public final class SessionsChallenge extends Challenge {
    * @param id positive ID
    * @param memberId owner ID
    * @param name goal name
-   * @param target positive threshold
-   * @param startDate inclusive ISO start
-   * @param endDate inclusive ISO end
+   * @param target target number greater than zero
+   * @param startDate first date that counts, in YYYY-MM-DD format
+   * @param endDate last date that counts, in YYYY-MM-DD format
    */
   public SessionsChallenge(
       int id, int memberId, String name, int target, String startDate, String endDate) {

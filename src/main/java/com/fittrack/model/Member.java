@@ -7,6 +7,7 @@ package com.fittrack.model;
  */
 public final class Member implements Identifiable {
 
+  // These fields store the member details. They cannot change after the object is created.
   private final int memberId;
   private final String name;
   private final String email;
@@ -15,13 +16,14 @@ public final class Member implements Identifiable {
   /**
    * Constructs a new fitness member.
    *
-   * @param memberId unique member identifier
+   * @param memberId unique member ID
    * @param name member's full name
    * @param email member's email address
    * @param age member's age
    */
   public Member(int memberId, String name, String email, int age) {
 
+    // This checks the member details before the object is created.
     if (memberId <= 0) {
       throw new IllegalArgumentException("Member ID must be positive");
     }
@@ -38,6 +40,7 @@ public final class Member implements Identifiable {
       throw new IllegalArgumentException("Age must be positive");
     }
 
+    // This saves the checked details and removes spaces at the start and end of text.
     this.memberId = memberId;
     this.name = name.strip();
     this.email = email.strip();
@@ -51,7 +54,7 @@ public final class Member implements Identifiable {
   }
 
   /**
-   * Returns the member's unique identifier.
+   * Returns the member's unique ID.
    *
    * @return member ID
    */

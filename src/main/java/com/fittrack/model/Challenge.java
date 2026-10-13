@@ -3,7 +3,7 @@ package com.fittrack.model;
 import java.time.LocalDate;
 import java.util.List;
 
-/** A member's goal within an inclusive date interval. Subclasses define the scoring rule. */
+/** A member's goal between two dates, including both dates. Each subclass supplies its own scoring rule. */
 public abstract class Challenge implements Identifiable {
   private final int id;
   private final int memberId;
@@ -19,11 +19,12 @@ public abstract class Challenge implements Identifiable {
    * @param memberId owner ID
    * @param name descriptive goal name
    * @param target positive goal
-   * @param startDate inclusive ISO start
-   * @param endDate inclusive ISO end
+   * @param startDate first date that counts, in YYYY-MM-DD format
+   * @param endDate last date that counts, in YYYY-MM-DD format
    */
   protected Challenge(
       int id, int memberId, String name, int target, String startDate, String endDate) {
+    // This checks the goal details and makes sure its end date is not before its start date.
     if (id <= 0 || memberId <= 0 || target <= 0)
       throw new IllegalArgumentException("IDs and target must be positive");
     if (name == null || name.isBlank() || name.length() > 200)
@@ -67,7 +68,7 @@ public abstract class Challenge implements Identifiable {
   }
 
   /**
-   * Returns goal threshold.
+   * Returns the number of minutes or sessions needed to reach the goal.
    *
    * @return target
    */
@@ -78,7 +79,7 @@ public abstract class Challenge implements Identifiable {
   /**
    * Returns first included date.
    *
-   * @return ISO date
+   * @return date in YYYY-MM-DD format
    */
   public String getStartDate() {
     return startDate;
@@ -87,21 +88,21 @@ public abstract class Challenge implements Identifiable {
   /**
    * Returns last included date.
    *
-   * @return ISO date
+   * @return date in YYYY-MM-DD format
    */
   public String getEndDate() {
     return endDate;
   }
 
   /**
-   * Returns a stable storage discriminator.
+   * Returns the goal type saved in the database.
    *
    * @return MINUTES or SESSIONS
    */
   public abstract String getType();
 
   /**
-   * Scores workouts using the specialised goal rule.
+   * Counts minutes or sessions using the rule for this goal type.
    *
    * @param workouts candidate workouts
    * @return achieved units
@@ -109,10 +110,10 @@ public abstract class Challenge implements Identifiable {
   public abstract long score(List<Workout> workouts);
 
   /**
-   * Selects only workouts owned by this member in the goal interval.
+   * Selects this member's workouts between the goal's start and end dates.
    *
    * @param workouts all candidate workouts
-   * @return read-only qualifying workouts
+   * @return a list of matching workouts that cannot be changed
    */
   protected List<Workout> qualifying(List<Workout> workouts) {
     return workouts.stream()
@@ -125,10 +126,10 @@ public abstract class Challenge implements Identifiable {
   }
 
   /**
-   * Calculates immutable progress, dispatching to the subclass scoring rule.
+   * Calculates progress by calling the scoring method supplied by the goal subclass.
    *
    * @param workouts candidate workouts
-   * @return progress snapshot
+   * @return the calculated goal progress
    */
   public Progress progress(List<Workout> workouts) {
     long achieved = score(workouts);
@@ -137,12 +138,12 @@ public abstract class Challenge implements Identifiable {
   }
 
   /**
-   * Value owned by a challenge, containing calculated progress.
+   * Stores the calculated goal progress in values that cannot be changed.
    *
-   * @param achieved units achieved
-   * @param target goal threshold
-   * @param percentage completion capped at 100
-   * @param completed whether threshold was reached
+   * @param achieved minutes or sessions completed
+   * @param target minutes or sessions needed to reach the goal
+   * @param percentage progress percentage, limited to 100
+   * @param completed whether the goal has been reached
    */
   public record Progress(long achieved, int target, double percentage, boolean completed) {}
 }

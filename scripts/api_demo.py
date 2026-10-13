@@ -38,7 +38,7 @@ def request(method, path, expected, body=None):
         return json.loads(text) if text else None
 
 
-# Abort before changing anything if an ID is already in use.
+# This stops the demo before any changes if its reserved ID is already in use.
 for resource in ('members', 'workouts', 'challenges'):
     request('GET', f'/{resource}/{ID}', 404)
 

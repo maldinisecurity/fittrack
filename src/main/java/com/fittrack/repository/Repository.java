@@ -5,47 +5,47 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Small CRUD contract shared by memory and JDBC storage.
+ * Shared methods for adding, reading, changing and deleting records in memory or a database (CRUD).
  *
- * @param <T> stored entity type
+ * @param <T> type of record being stored
  */
 public interface Repository<T extends Identifiable> {
   /**
-   * Lists a snapshot in ID order.
+   * Returns a separate list of records sorted by ID.
    *
-   * @return entities
+   * @return saved records
    */
   List<T> findAll();
 
   /**
-   * Looks up an entity.
+   * Finds a record by its ID.
    *
-   * @param id entity ID
-   * @return matching entity if present
+   * @param id record ID
+   * @return the matching record, or an empty result if it does not exist
    */
   Optional<T> findById(int id);
 
   /**
-   * Inserts an entity.
+   * Adds a new record.
    *
-   * @param entity new entity
+   * @param entity new record
    * @throws ConflictException if ID already exists
    */
   void create(T entity);
 
   /**
-   * Replaces an existing entity.
+   * Updates an existing record.
    *
-   * @param entity replacement
-   * @return whether updated
+   * @param entity updated record
+   * @return true if a record was updated
    */
   boolean update(T entity);
 
   /**
-   * Deletes an entity.
+   * Deletes a record.
    *
-   * @param id entity ID
-   * @return whether deleted
+   * @param id record ID
+   * @return true if a record was deleted
    */
   boolean delete(int id);
 }

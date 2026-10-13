@@ -1,6 +1,6 @@
 'use strict';
 
-// 1. Keep a copy of the records so each page can use the same data.
+// 1. This keeps a copy of the records for all four pages.
 const records = { members: [], workouts: [], challenges: [], progress: new Map() };
 const pageNames = ['overview', 'members', 'workouts', 'challenges'];
 let selectedMember = 'all';
@@ -14,7 +14,7 @@ const find = (id) => document.getElementById(id);
 const recordDialog = find('record-dialog');
 const deleteDialog = find('delete-dialog');
 
-// Create text safely. A member name is treated as text, never as HTML code.
+// This creates text safely. A member name is treated as text, never as HTML code.
 function make(tag, className, text) {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -27,7 +27,7 @@ function showMessage(id, message) {
   find(id).hidden = !message;
 }
 
-// Send a request to the Java API on the same address as this webpage.
+// This sends requests to the Java API using the webpage address.
 async function api(path, method = 'GET', body) {
   let response;
   try {
@@ -44,7 +44,7 @@ async function api(path, method = 'GET', body) {
   return result;
 }
 
-// Load all three record lists, then ask Java to calculate each goal's progress.
+// This loads the three record lists and their challenge progress from Java.
 async function loadRecords() {
   if (loading) return;
   loading = true;
@@ -58,7 +58,7 @@ async function loadRecords() {
     const progress = await Promise.all(challenges.map(async (challenge) => [
       challenge.id, await api(`/challenges/${challenge.id}/progress`)
     ]));
-    // Replace the screen's data only after all requests have succeeded.
+    // The screen data changes only after all requests finish successfully.
     records.members = members;
     records.workouts = workouts;
     records.challenges = challenges;
@@ -80,7 +80,7 @@ async function loadRecords() {
   }
 }
 
-// 2. Page navigation and shared display helpers.
+// 2. These functions switch pages and format names, dates and tables.
 function showPage() {
   const requestedPage = location.hash.slice(1) || 'overview';
   const page = pageNames.includes(requestedPage) ? requestedPage : 'overview';
@@ -173,7 +173,7 @@ function progressDisplay(challenge) {
   return block;
 }
 
-// 3. Draw the four pages using the latest records.
+// 3. This displays the four pages using the latest records.
 function renderPages() {
   const workouts = records.workouts.filter((w) => selectedMember === 'all' || String(w.memberId) === selectedMember);
   const challenges = records.challenges.filter((c) => selectedMember === 'all' || String(c.memberId) === selectedMember);
@@ -221,7 +221,7 @@ function renderPages() {
   find('challenges-list').replaceChildren(...(goalCards.length ? goalCards : [make('p', 'empty', 'No challenges yet. Add a member, then choose a goal.')]));
 }
 
-// 4. Build a labelled form. The Java API still checks every value before saving.
+// 4. This creates labelled forms. Java also checks the values before saving.
 function addField(name, label, type, value, options = {}) {
   const wrapper = make('label', 'form-field');
   wrapper.append(make('span', '', label));
@@ -328,7 +328,7 @@ async function saveRecord(event) {
   }
 }
 
-// 5. Ask before deleting. The server protects members with linked records.
+// 5. This confirms deletions. The server protects members with linked records.
 function openDelete(resource, record) {
   deletingRecord = { resource, id: record.id };
   find('delete-message').textContent = `Delete “${record.name || record.activityType}”? This cannot be undone.` +
@@ -357,7 +357,7 @@ async function deleteRecord() {
   }
 }
 
-// 6. Connect the buttons and start the first load.
+// 6. This connects button actions and loads the first page.
 find('today').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
 window.addEventListener('hashchange', showPage);
 find('refresh').addEventListener('click', loadRecords);

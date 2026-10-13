@@ -5,8 +5,9 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * JDBC CRUD with prepared statements and deterministic resource closure. SQL identifiers are fixed
- * in source; user input is bound only as parameters.
+ * Adds, reads, changes and deletes database records using JDBC.
+ * Prepared statements keep user values separate from SQL commands.
+ * Connections, statements and results are closed after use.
  *
  * @param <T> entity type
  */
@@ -91,7 +92,7 @@ public final class JdbcRepository<T extends Identifiable> implements Repository<
   }
 
   /**
-   * Creates polymorphic challenge storage.
+   * Creates database storage that reads and saves both challenge types.
    *
    * @param connections connection supplier
    * @return repository

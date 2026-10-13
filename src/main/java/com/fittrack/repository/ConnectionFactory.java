@@ -3,7 +3,7 @@ package com.fittrack.repository;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/** Supplies independent connections; callers close each connection after use. */
+/** Opens a separate database connection for each operation. The calling code closes it after use. */
 @FunctionalInterface
 public interface ConnectionFactory {
   /**

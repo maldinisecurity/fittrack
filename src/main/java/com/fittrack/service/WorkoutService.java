@@ -76,7 +76,7 @@ public class WorkoutService {
   }
 
   /**
-   * Returns a read-only snapshot of workouts.
+   * Returns a separate workout list that cannot be changed.
    *
    * @return list of workouts
    */
