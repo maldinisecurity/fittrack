@@ -199,7 +199,7 @@ mysqlsh --sql \
   --user=avnadmin \
   --password \
   --ssl-mode=VERIFY_CA \
-  --ssl-ca=/Users/YOUR_MAC_USERNAME/Downloads/ca.pem \
+  --ssl-ca="$HOME/Downloads/ca.pem" \
   --database=defaultdb
 ```
 
@@ -214,7 +214,7 @@ On this Mac, the installed Workbench also includes a working MySQL Shell at this
   --user=avnadmin \
   --password \
   --ssl-mode=VERIFY_CA \
-  --ssl-ca=/Users/YOUR_MAC_USERNAME/Downloads/ca.pem \
+  --ssl-ca="$HOME/Downloads/ca.pem" \
   --database=defaultdb
 ```
 
